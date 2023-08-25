@@ -1,0 +1,58 @@
+---
+# https://www.youtube.com/watch?v=yiooWsMERaY&list=PLMyOob-UkeytIleCbMlFfCzaunOh27hm6&index=2
+
+- name: run tasks on all hosts
+  hosts: "*"
+  tasks:
+    - name: ensure a directory exists
+      file:
+        path: $HOME/test_directory
+        state: directory
+
+    - name: create multiple directories in a loop
+      file:
+        path: "HOME/{{ item }}"     # jinja2 format using 'item'
+        state: directory
+      loop:
+        - test_dir1
+        - test_dir2
+        - test_dir3
+    
+    - name: remove directory
+      file:
+        path: $HOME/test_directory
+        state: absent
+
+    - name: change directory permissions
+      file:
+        path: "/home/{{ ansible_user }}/test_directory"   # need this, otherwise it modifies the root users files since at the end we elevate to root to chmod
+        state: directory
+        owner: root
+        group: root
+        mode: 0755      # by default when created by 'file' they are 0775
+      become: true
+
+    - name: ensure file exists
+      file:
+        path: $HOME/test_file
+        state: touch    # if you use 'file' module it will fail and we don't want that
+      
+    - name: remove file
+      file:
+        path: $HOME/test_file
+        state: absent
+
+    - name: create symlink to test_file
+      file:
+        src: $HOME/test_file
+        dest: $HOME/test_file_link
+        state: link
+
+    - name: remove symlink and file
+      file:
+        path: "$HOME/{{ item }}"
+        state: absent
+      loop:
+        - test_file_link
+        - test_file
+        

@@ -1,0 +1,5 @@
+[centos]
+centos_7 ansible_host=13.236.67.71
+
+[ubuntu]
+ubuntu_bionic_1804 ansible_host=13.211.97.135

@@ -1,0 +1,43 @@
+---
+# https://www.youtube.com/watch?v=RXtvhicOlWA
+
+- name: run tasks on all hosts
+  hosts: "*"    # could specify RedHat hosts only, depending on org of hosts file
+  tasks:
+    - name: install epel repo
+      yum:
+        name: epel-release
+        state: present
+        update_cache: true
+      become: true
+      when: ansible_os_family == "RedHat"   # prevents it from running against other hosts
+
+    - name: install redis
+      yum:
+        name:
+          - redis
+          - python-redis
+        state: present
+        update_cache: true
+      become: true
+
+    - name: install ruby
+      yum:
+        name: ruby-2.0.0.648-33.el7_4   # use the version number to specify a ver
+        state: present
+        update_cache: true
+      become: true
+
+    - name: update ruby
+      yum:
+        name: ruby
+        state: latest     # latest command ensures its updated 'present' will simply check to see if it exists, if it does it does not update
+        update_cache: true
+      become: true
+
+    - name: remove ruby
+      yum:
+        name: ruby
+        state: absent     # change from present/latest
+        autoremove: true  # removes any installed dependencies as well
+      become: true
