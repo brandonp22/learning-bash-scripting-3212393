@@ -1,0 +1,48 @@
+---
+# ansible-playbook fetch.yml
+
+# https://www.youtube.com/watch?v=LaPzaJG9Tog&list=PLMyOob-UkeytIleCbMlFfCzaunOh27hm6&index=3
+
+# fetch is used to download files from remote machines
+
+- name: run tasks on all hosts
+  hosts: "8"
+  tasks:
+    - name: ensure a file exists
+      file:
+        path: "/home/{{ ansible_user }}/test_file"
+        state: touch
+
+    - name: fetch test_file
+      fetch:
+        src: "/home/{{ ansible_user }}/test_file"
+        dest: fetched   # this copies the entire directory structure to the file fetched
+
+    - name: ensure a specific file exists
+      copy:
+        dest: "/home/{{ ansible_user }}/test_file"
+        content: "{{ ansible_host }}"     # creates a test file with host IP address in it
+
+    - name: fetch test_file
+      fetch:
+        src: "/home/{{ ansible_user }}/test_file"
+        dest: "fetched/{{ inventory_hostname }}/"   # creates a file directory based on host name
+        flat: true    # prevents the entire directory stucture from being copied
+
+    - name: ensure a specific file exists
+      copy:
+        dest: "/home/{{ ansible_user }}/{{ item }}"     # variable 'item' pulls from below the loop function
+        content: "{{ ansible_host }}"
+      loop:       # creates a loop which will place multiple files
+        - test_file1
+        - test_file2
+
+    - name: fetch test_file
+      fetch:
+        src: "/home/{{ ansible_user }}/{{ item }}"
+        dest: "fetched/{{ inventory_hostname }}/"
+        flat: true        
+      loop:       # creates a loop which will collect multiple files
+        - test_file1
+        - test_file2
+

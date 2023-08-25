@@ -1,0 +1,47 @@
+---
+# ansible-playbook command.yml
+
+# https://www.youtube.com/watch?v=3hqTgy9bH_A&list=PLMyOob-UkeytIleCbMlFfCzaunOh27hm6&index=8
+
+- name: run tasks on all hosts
+  hosts: "*"
+  tasks:
+    - name: sure file exists
+      command: touch /tmp/test_file   # file is better, demo only
+
+    - name: using shell instead of command
+      command: echo "Hello world!" > /tmp/test_file2 # operators escape the command module, use shell instead
+      register: command_output
+
+    - debug: var=command_output
+
+    - name: using shell instead of command
+      shell: echo "Hello world!" > /tmp/test_file2 
+      
+    - name: run command in a different directory
+      command: touch test_file3
+      args:
+        chdir: /tmp/test_dir
+
+    - name: set environment variables
+      command: touch $TARGET_DIR/$FILENAME
+      environment:
+        TARGET_DIR: /tmp
+        FILENAME: test_file4
+
+    - name: set environment variables
+      command: touch $FILENAME
+      args:
+        chdir: $TARGET_DIR
+      environment:
+        TARGET_DIR: /tmp
+        FILENAME: test_file5
+
+    - name: run multiple commands
+      command: {{ item }}
+      loop:
+        - touch /tmp/test_file
+        - mkdir /tmp/test_dir
+        - mv /tmp/test_file /tmp/test_dir
+    
+    

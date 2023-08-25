@@ -1,0 +1,61 @@
+---
+# ansible-playbook apt.yml
+
+# https://www.youtube.com/watch?v=qXVDSogMFE8&list=PLMyOob-UkeytIleCbMlFfCzaunOh27hm6&index=7
+
+- name: run tasks on all hosts
+  hosts: "*"    # could specify this to "ubuntu"
+  tasks:
+    - name: install php7.2
+      apt:
+        name: php7.2
+        state: present
+        update_cache: true    # makes sure apt cache is up to date
+      become: true      # this will fail on Centos machine
+
+    - name: install php7.2 only on appropriate machine
+      apt:
+        name: php7.2
+        state: present
+        update_cache: true
+      become: true
+      when: ansible_os_family == 'Debian' # only runs on debian systems
+    
+    - name: install php7.2 using package module   # this may not work but maybe they have worked out the bugs by now, video is 4yrs old
+      package:    # manages packages based on OS package manager
+        name: php7.2
+          state: present
+          update_cache: true    # makes sure apt cache is up to date
+        become: true 
+
+    - name: install multiple packages
+      apt:
+        name:
+        - php7.2
+        - php7.2-mysql
+        state: present
+        update_cache: true
+      become: true
+
+    - name: install specific version of a package
+      apt:
+        name: php7.2=7.2.3-1ubuntu1    # specific version number
+        state: present    
+        update_cache: true
+      become: true
+
+    - name: upgrade package version
+      apt:
+        name: php7.2
+        state: latest     # this will update it, present will only check if it is there, if its not it will install the latest version but not update, best practice is use 'present'
+        update_cache: true
+      become: true
+
+    - name: remove a package
+      apt:
+        name: php7.2
+        state: absent
+        autoremove: true  # redundant dependencies are removed as well
+      become: true
+
+    

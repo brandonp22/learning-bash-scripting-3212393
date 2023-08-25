@@ -1,0 +1,74 @@
+---
+# ansible-playbook template.yml
+
+# https://www.youtube.com/watch?v=tcP_gxOo7mk&list=PLMyOob-UkeytIleCbMlFfCzaunOh27hm6&index=5
+
+# the .j2 extension is for jinja2 which is the template language used by ansible
+
+- name: run tasks on all hosts
+  hosts: "*"
+  vars:     
+    env: staging      # not sure why 'staging' is used??
+    my_app_version: v1.1    # added when we did multiple files
+  tasks:
+    - name: template file onto remote hosts
+      template:
+        src: my_app.conf.j2
+        dest: /etc/my_app.conf    # now no longer a template
+      become: true
+
+    - name: template file onto remote hosts with permissions
+      template:
+        src: my_app.conf.j2
+        dest: /etc/my_app.conf
+        owner: root
+        group: root
+        mode: 0600
+      become: true
+
+    - name: template multiple files onto remote hosts
+      template:
+        src: "{{ item }}.j2"
+        dest: /etc/{{ item }}
+        owner: root
+        group: root
+        mode: 0600
+      become: true
+      loop:
+        - my_app.conf
+        - my_app-release
+
+
+########## advanced loops #################
+
+# https://www.youtube.com/watch?v=dXl9Yphzbm4&list=PLMyOob-UkeytIleCbMlFfCzaunOh27hm6&index=6
+
+- name: run tasks on all hosts
+  hosts: "*"
+  vars:
+    users:
+      - name: John Smith
+        username: jsmith
+      - name: Jane Doe
+        username: jdoe
+  tasks:
+    - name: ensure users exist
+      user: "{{ user.username }}"   # instead of 'item' 'user' is defined below
+      comment: "{{ user.name }}"
+      state: present
+    become: true
+    loop: "{{ users }}"
+    loop_control:
+      loop_var: user    # specifies which var to loop
+
+    - name: create .gitconfig for each user
+      template:
+        src: .gitconfig.j2    # j2 template for the file content
+        dest: "/home/{{ user.username }}/.gitconfig"
+        owner: "{{ user.username }}"    # since become is used chmod
+        group: "{{ user.username }}"
+        mode: 0644
+      become: true
+      loop: "{{ users }}"
+      loop_control:
+        loop_var: user

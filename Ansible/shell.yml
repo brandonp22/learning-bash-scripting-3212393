@@ -1,0 +1,42 @@
+---
+# ansible-playbook shell.yml
+
+# https://www.youtube.com/watch?v=57gAqKvAKck&list=PLMyOob-UkeytIleCbMlFfCzaunOh27hm6&index=10
+
+- name: run on all hosts
+  hosts: "*"
+  tasks:
+    - name: run command with shell
+      shell: echo "Hello shell!" >  /tmp/shell_output
+      register: shell_output
+    
+    - name: run command with command
+      command: echo "Hello command!" >  /tmp/command_output
+      register: command_output
+
+    - name: debug shell_output
+      debug: var=shell_output
+
+    - name: debug command_output
+      debug: var=command_output   # command escapes the operators (> | &&) and passes the command as a string; this is safer by default and avoids any command injection
+
+    - name: use args, environment and loop with shell
+      shell: "echo "Hello world" > $TARGET"
+      args: 
+        chdir: /tmp
+      environment:
+        TARGET: "{{ item }}"
+      loop:
+        - test_file1
+        - test_file2
+
+# the dangers of using shell with a shell injection
+
+  vars:
+    message: hacked > /tmp/hacked && echo hacked
+    - name: echo content to test file
+      shell: "echo {{ message }} > /tmp/test_file"
+
+    - name: use a quote filter to prevent shell injection
+      shell: "echo {{ message | quote }} > /tmp/test_file"
+      # | quuote prevents shell from interpreting the operators as commands

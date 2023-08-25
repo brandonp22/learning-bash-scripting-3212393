@@ -1,0 +1,3 @@
+---
+ansible_user: ubuntu      # sets the username for the dest machine rather than host username
+ansible_python_interpreter: /usr/bin/python3

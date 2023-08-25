@@ -1,0 +1,51 @@
+---
+# ansible-playbook copy.yml
+
+# https://www.youtube.com/watch?v=hD5DpWmvr4A&list=PLMyOob-UkeytIleCbMlFfCzaunOh27hm6&index=4
+
+- name: run taks on all hosts
+  hosts: "*"
+  tasks:
+    - name: copy file to remote host
+      copy:
+        src: test_cpy_file    # by defualt ansible uses the file folder
+        dest: $HOME/test_cpy_file
+
+    - name: copy multiple files to remote host
+      copy:
+        src: {{ item }}    # variable defined below
+        dest: $HOME/{{ item }}    # need the variable here as well
+      loop:     # loops the action and defines variable
+        - test_cpy_file
+        - test_cpy_file2
+
+    - name: copy directory recusively to remote host
+      copy:
+        src: test_dir   # again default is in the file folder
+        # if you do not want the 'test_dir' to copy and only contents then src: test_dir/
+        dest: $HOME     # if you add /test_dir it will copy inside an extra level of /test_dir
+
+    - name: copy a file to remote host and set permissions
+      copy:
+        src: my_app.conf
+        dest: /etc/my_app.conf
+        owner: root
+        group: root
+        mode: 0600
+      become: true
+
+    - name: copy file ON remote host
+      copy:
+        src: $HOME/test_file
+        dest: $HOME/test_file.copy
+        remote_src: true    # tells ansible it is a remote host doing this
+
+    - name: write content to file
+      copy:
+        dest: $HOME/hello_world     # no source needed since we specify the content
+        content: "Hello World!\n"
+    
+    - name: write content to file using a template
+      copy:
+        dest: $HOME/test_file
+        content: "{{ ansible_host }}\n"

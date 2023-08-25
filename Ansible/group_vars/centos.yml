@@ -1,0 +1,2 @@
+---
+ansible_user: centos      # sets the username for the dest machine rather than host username

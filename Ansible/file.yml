@@ -1,9 +1,15 @@
 ---
 # https://www.youtube.com/watch?v=yiooWsMERaY&list=PLMyOob-UkeytIleCbMlFfCzaunOh27hm6&index=2
 
+# ansible-playbook file.yml     # command to run this playbook
+
+
+
 - name: run tasks on all hosts
   hosts: "*"
   tasks:
+    - debug: var=ansible_host   # prints ip (can print other information variables)
+
     - name: ensure a directory exists
       file:
         path: $HOME/test_directory
