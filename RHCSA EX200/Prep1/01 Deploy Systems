@@ -1,0 +1,37 @@
+### Create a bootable CentOS 8 Stream USB drive
+- for windows WIN32 Disk Imager
+### Install Linux on physical machine
+- server with GUI; no additional
+### Virtualization
+- Kernel-base Virtual Machine (KVM)
+  - allows overcommitting resources
+  - disk I/O throttling
+  - nested virtualization
+  - uses libvirt API
+  - fast using paravirtualization
+  - slow using emulation
+  - shared devices
+- Quick Emulator (QEMU)
+- Virtual Machine Manager GUI
+### Prepare host for virt
+```sudo yum install qemu-kvm virt-manager libvirt-client```
+```sudo yum group install "Virtualization Client```
+  - installs all the virt tools as a group plus a few others
+```sudo systemctl start libvirtd```
+```sudo systemctl enable libvirtd```
+reboot
+
+### install linux interactively
+*install gnome tweaks and turn on application menu*
+- Virt Machine Manager
+  - Create a new CentOS, VM 2Gb, 2 cores, 10Gb disk, *rhhost1*, macvtap net bridge
+  - install OS: workstation, turn on net *rhhost1.localnet.com* user1 = admin,
+
+### kickstart file to automate installs
+- kickstart file created by RHEL and supported
+- **exercise files**
+- centos8-ks.cfg
+  - ```less -N centos8-ks.cfg```
+ 
+### install linux unattended
+- 
